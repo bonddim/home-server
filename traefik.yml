@@ -1,0 +1,22 @@
+---
+- hosts: server
+  become: true
+  vars_files:
+    - ~/.ansible/vault
+  vars:
+    traefik_provider_docker: true
+    traefik_host_domainname: "{{ main_domain }}"
+    traefik_basic_auth_user: "{{ vault_basic_auth_user }}"
+    traefik_basic_auth_pass: "{{ vault_basic_auth_pass }}"
+    traefik_enable_https: true
+    traefik_tls_resolver: acme
+    traefik_acme_dns_provider: duckdns
+    traefik_acme_email: "{{ user_email }}"
+    traefik_env:
+      DUCKDNS_TOKEN: "{{ vault_duckdns_token }}"
+    traefik_http_routes:
+      - name: router
+        url: [ "http://192.168.1.1" ]
+
+  roles:
+    - bonddim.traefik

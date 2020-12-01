@@ -2,8 +2,6 @@
 - name: Deploy traefik binary with systemd service and Google OAuth
   hosts: server
   become: true
-  vars_files:
-    - ~/.ansible/vault
 
   pre_tasks:
     - name: Start auth container for forwardauth middleware
@@ -12,17 +10,17 @@
         name: auth
         image: thomseddon/traefik-forward-auth
         env:
-          AUTH_HOST: "auth.{{ main_domain }}"
-          COOKIE_DOMAIN: "{{ main_domain }}"
+          AUTH_HOST: "auth.{{ vault_main_domain }}"
+          COOKIE_DOMAIN: "{{ vault_main_domain }}"
           PROVIDERS_GOOGLE_CLIENT_ID: "{{ vault_google_client_id }}"
           PROVIDERS_GOOGLE_CLIENT_SECRET: "{{ vault_google_client_secret }}"
           SECRET: "{{ vault_auth_secret }}"
-          WHITELIST: "{{ user_email }}"
+          WHITELIST: "{{ vault_user_email }}"
+          LIFETIME: "86400"
         network_mode: bridge
         published_ports:
           - '127.0.0.1:4181:4181'
         restart_policy: unless-stopped
-        container_default_behavior: compatibility
         labels:
           traefik.enable: 'true'
           traefik.http.routers.auth.entrypoints: websecure
@@ -34,16 +32,3 @@
 
   roles:
     - role: bonddim.traefik
-      traefik_provider_docker: true
-      traefik_host_domainname: "{{ main_domain }}"
-      traefik_dashboard_middlewares: auth-forward@docker
-      traefik_enable_https: true
-      traefik_tls_resolver: acme
-      traefik_acme_dns_provider: duckdns
-      traefik_acme_email: "{{ user_email }}"
-      traefik_env:
-        DUCKDNS_TOKEN: "{{ vault_duckdns_token }}"
-      traefik_http_routes:
-        - name: router
-          url: [ "http://192.168.1.1" ]
-          middlewares: auth-forward@docker

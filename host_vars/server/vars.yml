@@ -1,0 +1,20 @@
+---
+### docker
+docker_compose_install: true
+
+### traefik
+traefik_enable_https: true
+traefik_tls_resolver: acme
+traefik_host_domainname: "{{ vault_main_domain }}"
+traefik_acme_email: "{{ vault_user_email }}"
+traefik_acme_dns_provider: duckdns
+traefik_env:
+  DUCKDNS_TOKEN: "{{ vault_duckdns_token }}"
+
+traefik_provider_docker: true
+traefik_dashboard_middlewares: auth-forward@docker
+
+traefik_http_routes:
+  - name: router
+    url: [ "http://{{ ansible_default_ipv4.gateway }}" ]
+    middlewares: auth-forward@docker

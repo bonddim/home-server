@@ -1,0 +1,62 @@
+---
+- hosts: server
+  become: true
+  tasks:
+    - name: Create media server group
+      group:
+        name: "{{ media_user }}"
+        state: present
+        system: true
+
+    - name: Create media server user
+      user:
+        name: "{{ media_user }}"
+        group: "{{ media_user }}"
+        home: "{{ media_home }}"
+        create_home: false
+        shell: /bin/false
+        state: present
+        system: true
+      register: _media_user
+      tags: always
+
+    - name: Ensure docker network state
+      docker_network:
+        name: "{{ media_docker_network }}"
+        state: present
+
+    - name: Ensure config directories exists
+      file:
+        path: "{{ media_home }}/{{ item.name }}"
+        state: directory
+        owner: "{{ media_user }}"
+        group: "{{ media_user }}"
+        mode: 0755
+      loop: "{{ media_services }}"
+      loop_control:
+        label: "{{ item.name }}"
+
+    - name: Ensure media directories exists
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: "{{ media_user }}"
+        group: "{{ media_user }}"
+        mode: 0755
+      loop: "{{ media_dirs }}"
+
+    - name: Generate docker-compose file
+      template:
+        dest: "{{ media_home }}/docker-compose.yaml"
+        src: docker-compose.yaml.j2
+        lstrip_blocks: true
+        trim_blocks: true
+        owner: "{{ media_user }}"
+        group: "{{ media_user }}"
+        mode: 0640
+
+    - name: Launch services
+      docker_compose:
+        project_src: "{{ media_home }}"
+        remove_orphans: true
+        pull: true

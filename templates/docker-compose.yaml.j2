@@ -1,0 +1,40 @@
+---
+### {{ ansible_managed }}
+version: "2.4"
+services:
+{% for service in media_services %}
+  {{ service.name }}:
+    image: {{ service.image }}
+    container_name: {{ service.name }}
+    environment:
+      PUID: {{ _media_user.uid }}
+      PGID: {{ _media_user.group }}
+      TZ: Europe/Kiev
+      {% if service.env is defined %}
+      {% for key, value in service.env.items() %}
+      {{ key }}: {{ value }}
+      {% endfor %}
+      {% endif%}
+    {% if service.volumes is defined %}
+    volumes: {{ service.volumes }}
+    {% endif %}
+    {% if service.ports is defined %}
+    ports: {{ service.ports }}
+    {% endif %}
+    network_mode: {{ service.network_mode | default(media_docker_network | default('bridge')) }}
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    {% if service.labels is defined or service.traefik_expose is defined %}
+    labels:
+      {% if service.traefik_expose | default(false) %}
+      traefik.enable: 'true'
+      traefik.http.routers.{{ service.name }}.entrypoints: websecure
+      traefik.http.routers.{{ service.name }}.rule: "Host(`{{ service.name }}.{{ traefik_host_domainname }}`)"
+      {% if service.traefik_server_port is defined %}
+      traefik.http.services.{{ service.name }}.loadbalancer.server.port: {{ service.traefik_server_port }}
+      {% endif %}
+      {% endif %}
+    {% endif %}
+
+{% endfor %}

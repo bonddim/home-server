@@ -2,3 +2,4 @@
 - import_playbook: docker.yml
 - import_playbook: traefik.yml
 - import_playbook: media.yml
+- import_playbook: jenkins.yml

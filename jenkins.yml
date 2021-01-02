@@ -1,0 +1,52 @@
+---
+- hosts: server
+  become: true
+  tasks:
+    - name: Create Jenkins group
+      group:
+        name: "{{ jenkins_user }}"
+        state: present
+        system: true
+
+    - name: Create Jenkins user
+      user:
+        name: "{{ jenkins_user }}"
+        group: "{{ jenkins_group }}"
+        groups: "{{ jenkins_groups }}"
+        append: true
+        create_home: true
+        generate_ssh_key: true
+        shell: /bin/bash
+        state: present
+        system: true
+      register: _jenkins_user
+      tags: always
+
+    - name: Add self public ssh key to authorized keys
+      authorized_key:
+        user: "{{ jenkins_user }}"
+        key: "{{ _jenkins_user.ssh_public_key }}"
+        state: present
+
+    - name: Ensure Jenkins volume dir exists
+      file:
+        path: "{{ jenkins_volume }}"
+        state: directory
+        owner: "{{ jenkins_user }}"
+        group: "{{ jenkins_group }}"
+
+    - name: Start Jenkins container
+      docker_container:
+        name: jenkins
+        image: "{{ jenkins_image }}"
+        pull: true
+        network_mode: bridge
+        restart_policy: unless-stopped
+        user: "{{ _jenkins_user.uid }}:{{ _jenkins_user.group }}"
+        volumes:
+          - "{{ jenkins_volume }}:/var/jenkins_home"
+        labels:
+          traefik.enable: 'true'
+          traefik.http.routers.jenkins.entrypoints: websecure
+          traefik.http.services.jenkins.loadbalancer.server.port: '8080'
+      tags: jenkins

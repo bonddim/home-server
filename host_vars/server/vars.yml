@@ -21,6 +21,7 @@ traefik_http_routes:
   - name: jellyfin
     url: [ "http://{{ ansible_default_ipv4.address }}:8096" ]
 
+### media
 media_user: mediaserver
 media_home: "/opt/{{ media_user }}"
 media_dirs:
@@ -52,3 +53,10 @@ media_services:
     image: ghcr.io/linuxserver/sonarr:preview
     volumes: [ "{{ media_home }}/sonarr:/config", "/media:/media" ]
     traefik_expose: true
+
+### jenkins
+jenkins_user: jenkins
+jenkins_group: "{{ jenkins_user }}"
+jenkins_groups: docker
+jenkins_volume: /opt/jenkins
+jenkins_image: jenkins/jenkins:lts-jdk11

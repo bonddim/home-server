@@ -1,0 +1,23 @@
+---
+- name: Server maintenance
+  hosts: server
+  become: true
+  tasks:
+    - name: Update all packages
+      apt:
+        name: '*'
+        state: latest
+        autoremove: true
+        update_cache: true
+
+    - name: Cleanup docker system
+      command: docker system prune --all --volumes --force
+
+    - name: Check if reboot required
+      stat:
+        path: /var/run/reboot-required
+      register: reboot
+
+    - name: Reboot server in 10 minutes
+      command: shutdown --reboot +10
+      when: reboot.stat.exists | bool

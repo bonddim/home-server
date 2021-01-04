@@ -60,3 +60,19 @@ jenkins_group: "{{ jenkins_user }}"
 jenkins_groups: docker
 jenkins_volume: /opt/jenkins
 jenkins_image: jenkins/jenkins:lts-jdk11
+
+### awx
+awx_repo: https://github.com/ansible/awx.git
+awx_repo_dir: "~/.ansible/awx"
+awx_version: devel
+awx_keep_updated: true
+awx_vars:
+  docker_compose_dir: /opt/awx/awxcompose
+  postgres_data_dir: /opt/awx/pgdocker
+  admin_user: "{{ vault_basic_auth_user }}"
+  admin_password: "{{ vault_user_pass }}"
+  create_preload_data: 'false'
+  awx_web_container_labels: '''
+    traefik.enable=true,
+    traefik.http.routers.awxweb.entrypoints=websecure,
+    traefik.http.routers.awxweb.rule=Host(`awx.{{ traefik_host_domainname }}`)'''

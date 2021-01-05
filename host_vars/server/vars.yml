@@ -7,9 +7,11 @@ traefik_enable_https: true
 traefik_tls_resolver: acme
 traefik_host_domainname: "{{ vault_main_domain }}"
 traefik_acme_email: "{{ vault_user_email }}"
-traefik_acme_dns_provider: duckdns
+traefik_acme_dns_provider: gcloud
 traefik_env:
-  DUCKDNS_TOKEN: "{{ vault_duckdns_token }}"
+  GCE_POLLING_INTERVAL: '10'
+  GCE_PROPAGATION_TIMEOUT: '300'
+  GCE_SERVICE_ACCOUNT_FILE: "/etc/traefik/gcp_credentials.json"
 
 traefik_provider_docker: true
 traefik_dashboard_middlewares: auth-forward@docker

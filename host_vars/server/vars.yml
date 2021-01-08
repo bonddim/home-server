@@ -55,6 +55,12 @@ media_services:
     image: ghcr.io/linuxserver/sonarr:preview
     volumes: [ "{{ media_home }}/sonarr:/config", "/media:/media" ]
     traefik_expose: true
+  - name: minio
+    image: minio/minio:latest
+    command: "server /data"
+    volumes: [ "{{ media_home }}/minio:/data" ]
+    env: { MINIO_ACCESS_KEY: "{{ vault_basic_auth_user }}", MINIO_SECRET_KEY: "{{ vault_user_pass }}" }
+    traefik_expose: true
 
 ### jenkins
 jenkins_user: jenkins

@@ -6,6 +6,9 @@ services:
   {{ service.name }}:
     image: {{ service.image }}
     container_name: {{ service.name }}
+    {% if service.command is defined %}
+    command: {{ service.command }}
+    {% endif %}
     environment:
       PUID: {{ _media_user.uid }}
       PGID: {{ _media_user.group }}

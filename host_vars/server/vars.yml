@@ -15,12 +15,12 @@ traefik_env:
   GCE_SERVICE_ACCOUNT_FILE: "/etc/traefik/gcp_credentials.json"
 
 traefik_provider_docker: true
-traefik_dashboard_middlewares: auth-forward@docker
+traefik_basic_auth_user: "{{ vault_basic_auth_user }}"
+traefik_basic_auth_pass: "{{ vault_user_pass_htpasswd }}"
 
 traefik_http_routes:
   - name: router
     url: [ "http://{{ ansible_default_ipv4.gateway }}" ]
-    middlewares: auth-forward@docker
   - name: jellyfin
     url: [ "http://{{ ansible_default_ipv4.address }}:8096" ]
 

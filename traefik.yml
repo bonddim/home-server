@@ -1,34 +1,6 @@
 ---
-- name: Deploy traefik binary with systemd service and Google OAuth
+- name: Deploy traefik binary with systemd service
   hosts: server
   become: true
-
-  pre_tasks:
-    - name: Start auth container for forwardauth middleware
-      # https://github.com/thomseddon/traefik-forward-auth
-      docker_container:
-        name: auth
-        image: thomseddon/traefik-forward-auth
-        env:
-          AUTH_HOST: "auth.{{ vault_main_domain }}"
-          COOKIE_DOMAIN: "{{ vault_main_domain }}"
-          PROVIDERS_GOOGLE_CLIENT_ID: "{{ vault_google_client_id }}"
-          PROVIDERS_GOOGLE_CLIENT_SECRET: "{{ vault_google_client_secret }}"
-          SECRET: "{{ vault_auth_secret }}"
-          WHITELIST: "{{ vault_user_email }}"
-          LIFETIME: "86400"
-        network_mode: bridge
-        published_ports:
-          - '127.0.0.1:4181:4181'
-        restart_policy: unless-stopped
-        labels:
-          traefik.enable: 'true'
-          traefik.http.routers.auth.entrypoints: websecure
-          traefik.http.routers.auth.middlewares: auth-forward
-          traefik.http.middlewares.auth-forward.forwardauth.address: http://127.0.0.1:4181
-          traefik.http.middlewares.auth-forward.forwardauth.authResponseHeaders: X-Forwarded-User
-          traefik.http.middlewares.auth-forward.forwardauth.trustForwardHeader: "true"
-      tags: traefik, auth
-
   roles:
     - role: bonddim.traefik

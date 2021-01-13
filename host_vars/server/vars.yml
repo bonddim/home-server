@@ -7,6 +7,7 @@ traefik_enable_https: true
 traefik_tls_resolver: acme
 traefik_host_domainname: "{{ vault_main_domain }}"
 traefik_acme_email: "{{ vault_user_email }}"
+traefik_acme_domains: [ { main: "*.{{ traefik_host_domainname }}" } ]
 traefik_acme_dns_provider: gcloud
 traefik_env:
   GCE_POLLING_INTERVAL: '10'

@@ -53,7 +53,7 @@ media_services:
     volumes: [ "{{ media_home }}/radarr:/config", "/media:/media" ]
     traefik_expose: true
   - name: sonarr
-    image: ghcr.io/linuxserver/sonarr:preview
+    image: ghcr.io/linuxserver/sonarr:latest
     volumes: [ "{{ media_home }}/sonarr:/config", "/media:/media" ]
     traefik_expose: true
   - name: minio

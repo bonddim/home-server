@@ -34,26 +34,25 @@ media_dirs:
 media_docker_network: public
 media_services:
   - name: jellyfin
-    image: jellyfin/jellyfin:latest
-    volumes: [ "{{ media_home }}/jellyfin/config:/config", "{{ media_home }}/jellyfin/cache:/cache", "/media:/media" ]
+    image: hotio/jellyfin:release
+    volumes: [ "{{ media_home }}/jellyfin:/config", "/media:/media" ]
     network_mode: host
-  - name: transmission
-    image: ghcr.io/linuxserver/transmission:latest
-    ports: [ "51413:51413", "51413:51413/udp" ]
-    volumes: [ "{{ media_home }}/transmission:/config", "/media/downloads:/downloads", "/media/downloads/watch:/watch", "/media:/media" ]
-    env: { USER: "{{ vault_basic_auth_user }}", PASS: "{{ vault_user_pass }}" }
+  - name: qbittorrent
+    image: hotio/qbittorrent:release
+    volumes: [ "{{ media_home }}/qbittorrent:/config", "/media/downloads:/media/downloads"]
+    ports: [ "30815:30815", "30815:30815/udp" ]
     traefik_expose: true
-    traefik_server_port: '9091'
+    traefik_server_port: '8080'
   - name: jackett
-    image: ghcr.io/linuxserver/jackett:latest
+    image: hotio/jackett:release
     volumes: [ "{{ media_home }}/jackett:/config" ]
     traefik_expose: true
   - name: radarr
-    image: ghcr.io/linuxserver/radarr:latest
+    image: hotio/radarr:release
     volumes: [ "{{ media_home }}/radarr:/config", "/media:/media" ]
     traefik_expose: true
   - name: sonarr
-    image: ghcr.io/linuxserver/sonarr:latest
+    image: hotio/sonarr:latest
     volumes: [ "{{ media_home }}/sonarr:/config", "/media:/media" ]
     traefik_expose: true
   - name: minio

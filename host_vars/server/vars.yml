@@ -7,11 +7,15 @@ traefik_enable_https: true
 traefik_tls_resolver: acme
 traefik_host_domainname: "{{ vault_main_domain }}"
 traefik_acme_email: "{{ vault_user_email }}"
-traefik_acme_domains: [ { main: "*.{{ traefik_host_domainname }}" } ]
+traefik_acme_domains:
+  - main: "*.{{ traefik_host_domainname }}"
+    sans: "{{ traefik_host_domainname }}"
 traefik_acme_dns_provider: gcloud
+traefik_acme_dns_disablepropagationcheck: true  # This undocumented parameter helps to get certs with dnsChallenge on gcloud and duckdns.org
+traefik_log_level: ERROR
 traefik_env:
+  GCE_TTL: '300'
   GCE_POLLING_INTERVAL: '10'
-  GCE_PROPAGATION_TIMEOUT: '300'
   GCE_SERVICE_ACCOUNT_FILE: "/etc/traefik/gcp_credentials.json"
 
 traefik_provider_docker: true

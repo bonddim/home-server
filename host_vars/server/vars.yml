@@ -71,6 +71,7 @@ media_services:
   - name: jellyfin
     image: hotio/jellyfin:release
     volumes: [ "{{ media_home }}/jellyfin:/config", "/media:/media" ]
+    devices: ['/dev/dri:/dev/dri']
     network_mode: host
   - name: qbittorrent
     image: hotio/qbittorrent:release

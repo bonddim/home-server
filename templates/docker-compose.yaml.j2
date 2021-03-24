@@ -12,12 +12,14 @@ services:
     environment:
       PUID: {{ _media_user.uid }}
       PGID: {{ _media_user.group }}
-      TZ: Europe/Kiev
       {% if service.env is defined %}
       {% for key, value in service.env.items() %}
       {{ key }}: {{ value }}
       {% endfor %}
       {% endif%}
+    {% if service.devices is defined %}
+    devices: {{ service.devices }}
+    {% endif %}
     {% if service.volumes is defined %}
     volumes: {{ service.volumes }}
     {% endif %}

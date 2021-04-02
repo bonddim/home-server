@@ -37,10 +37,6 @@ traefik_custom_config:
         entrypoints: [websecure]
         rule: 'Host(`adguard.{{ traefik_host_domainname }}`)'
         service: adguard
-      jellyfin:
-        entrypoints: [websecure]
-        rule: 'Host(`jellyfin.{{ traefik_host_domainname }}`)'
-        service: jellyfin
       router:
         entrypoints: [websecure]
         rule: 'Host(`router.{{ traefik_host_domainname }}`)'
@@ -54,10 +50,6 @@ traefik_custom_config:
         loadBalancer:
           servers:
             - url: 'http://{{ ansible_default_ipv4.gateway }}'
-      jellyfin:
-        loadBalancer:
-          servers:
-            - url: 'http://{{ ansible_default_ipv4.address }}:8096'
 
 ### media
 media_user: mediaserver
@@ -72,11 +64,13 @@ media_services:
     image: hotio/jellyfin:release
     volumes: [ "{{ media_home }}/jellyfin:/config", "/media:/media" ]
     devices: ['/dev/dri:/dev/dri']
-    network_mode: host
+    ports: [ "8096:8096" ]
+    traefik_expose: true
+    traefik_server_port: '8096'
   - name: qbittorrent
     image: hotio/qbittorrent:release
     volumes: [ "{{ media_home }}/qbittorrent:/config", "/media/downloads:/media/downloads"]
-    ports: [ "30815:30815", "30815:30815/udp" ]
+    ports: [ "{{ ansible_default_ipv4.address }}:30815:30815", "{{ ansible_default_ipv4.address }}:30815:30815/udp" ]
     traefik_expose: true
     traefik_server_port: '8080'
   - name: jackett

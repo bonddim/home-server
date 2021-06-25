@@ -8,3 +8,4 @@
     - bonddim.linux.docker
     - bonddim.linux.lxd
     - bonddim.linux.traefik
+    - bonddim.linux.adguardhome

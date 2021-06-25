@@ -20,19 +20,11 @@ traefik_log_level: ERROR
 traefik_custom_config:
   http:
     routers:
-      adguard:
-        entrypoints: [websecure]
-        rule: 'Host(`adguard.{{ traefik_host_domainname }}`)'
-        service: adguard
       router:
         entrypoints: [websecure]
         rule: 'Host(`router.{{ traefik_host_domainname }}`)'
         service: router
     services:
-      adguard:
-        loadBalancer:
-          servers:
-            - url: 'http://127.0.0.1:3000'
       router:
         loadBalancer:
           servers:
@@ -101,3 +93,13 @@ awx_vars:
     traefik.enable=true,
     traefik.http.routers.awxweb.entrypoints=websecure,
     traefik.http.routers.awxweb.rule=Host(`awx.{{ traefik_host_domainname }}`)'''
+
+### adguardhome
+adguardhome_install_method: docker
+adguardhome_docker_labels:
+  traefik.enable: 'true'
+  traefik.http.routers.adguard.entrypoints: 'websecure'
+  traefik.http.services.adguard.loadbalancer.server.port: '3000'
+adguardhome_docker_ports:
+  - 53:53/tcp
+  - 53:53/udp

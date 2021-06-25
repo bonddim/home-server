@@ -42,6 +42,7 @@
         pull: true
         network_mode: bridge
         restart_policy: unless-stopped
+        container_default_behavior: no_defaults
         user: "{{ _jenkins_user.uid }}:{{ _jenkins_user.group }}"
         volumes:
           - "{{ jenkins_volume }}:/var/jenkins_home"

@@ -2,6 +2,8 @@
 - hosts: all
   become: true
   gather_facts: true
+  vars_files:
+    - '{{ lookup("env", "ANSIBLE_VAULT_FILE") }}'
   roles:
     - bonddim.linux.docker
     - bonddim.linux.lxd

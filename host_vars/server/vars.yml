@@ -18,19 +18,6 @@ traefik_basic_auth_user: "{{ vault_basic_auth_user }}"
 traefik_basic_auth_pass: "{{ vault_user_pass_htpasswd }}"
 traefik_log_level: ERROR
 traefik_custom_config:
-  tcp:
-    routers:
-      lxd:
-        entrypoints: [websecure]
-        rule: 'HostSNI(`lxd.{{ traefik_host_domainname }}`)'
-        service: lxd
-        tls:
-          passthrough: true
-    services:
-      lxd:
-        loadBalancer:
-          servers:
-            - address: '127.0.0.1:8443'
   http:
     routers:
       adguard:

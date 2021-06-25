@@ -1,6 +1,0 @@
----
-- name: Deploy traefik binary with systemd service
-  hosts: server
-  become: true
-  roles:
-    - role: bonddim.traefik
